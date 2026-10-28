@@ -11,7 +11,7 @@ license: MIT License
 
 Help developers write and edit EAS CI/CD workflow YAML files.
 
-Agentic CI, Issue to PR, Bug triage, and QA Swarm (a headless agent plus an Expo Simulators session that posts evidence) are `eas-agentic-workflows`. Use this skill when one of those workflow files needs schema-level YAML help.
+Agentic CI, Issue to PR, Bug triage, and QA Swarm belong to `eas-agentic-workflows`. Each one runs a headless agent on an Expo Simulators session and posts evidence. Use this skill when one of those workflow files needs schema-level YAML help.
 
 ## Reference Documentation
 

@@ -23,11 +23,11 @@ Validate each workflow file. The `check` job sources the session script, runs th
 
 Fetch `issue-to-pr`. Install Agentic CI first.
 
-- `.eas/agents/github.mjs` — `issue`, `comment`, `open-pull-request`, `author-email`.
+- `.eas/agents/github.mjs` with commands `issue`, `comment`, `open-pull-request`, and `author-email`.
 - `.eas/agents/make-change.sh`
 - `.eas/agents/make-change.md`
-- `.eas/workflows/issue-to-pr.yml` — `workflow_dispatch` input `issue_number`.
-- `.github/workflows/agent-label.yml` — starts the EAS workflow when an issue gains the `agent` label. The Action uses `npm ci`. Change that command when the project uses another package manager.
+- `.eas/workflows/issue-to-pr.yml` with a `workflow_dispatch` input named `issue_number`.
+- `.github/workflows/agent-label.yml`. This file starts the EAS workflow when an issue gains the `agent` label. The Action uses `npm ci`. Change that command when the project uses another package manager.
 
 The user still has to run `gh secret set EXPO_TOKEN` (a second Developer robot token) and `gh label create agent`. Do not invent the token.
 
@@ -57,7 +57,7 @@ Fetch `qa-swarm` only after the user confirms they want it.
 - `.eas/agents/qa-lane.md`
 - `.eas/agents/qa-lane.sh`
 - `.eas/agents/start-session.sh`
-- `.eas/workflows/qa-swarm.yml` — one `lane_*` job per flow and platform. EAS Workflows has no matrix. Add a lane by copying a `lane_*` job, then add it to the `report` job's `after` list and markdown.
+- `.eas/workflows/qa-swarm.yml`. Add one `lane_*` job per flow and platform. EAS Workflows has no matrix. Add a lane by copying a `lane_*` job, then add it to the `report` job's `after` list and markdown.
 
 The lane script deploys an evidence site with `eas-simulator-evidence`. That site is public. Say so before leaving `--deploy-alias` in place. To keep evidence private, remove `--deploy-alias`, as the page describes.
 

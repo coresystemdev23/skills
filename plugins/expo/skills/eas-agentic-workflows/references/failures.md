@@ -13,9 +13,9 @@ Read this when a run finishes or a setup step fails. The workflow posts evidence
 
 Agentic CI comment links:
 
-- Session recording — the session page on expo.dev. Sign in with an account that can view the project.
-- Agent report and screenshots — the workflow run. Artifacts hold `agent-output/evidence`.
-- Try this build in your browser — starts a new simulator session for that build. Each click starts another session.
+- Session recording. This is the session page on expo.dev. Sign in with an account that can view the project.
+- Agent report and screenshots. This is the workflow run. Artifacts hold `agent-output/evidence`.
+- Try this build in your browser. The link starts a new simulator session for that build. Each click starts another session.
 
 Bug triage adds a folded report. A `REPLICATED` comment tells a person to read the report and then add the `agent` label. That label starts Issue to PR, which follows the issue text, including tester text. Do not add the label yourself.
 

@@ -14,9 +14,9 @@ Slugs: `introduction`, `agentic-ci`, `issue-to-pr`, `bug-triage`, `qa-swarm`.
 
 The script prints the markdown on stdout and `source: <url>` on stderr. It tries these bases in order:
 
-1. `https://docs.expo.dev/agentic-workflows/<slug>.md` — path the guides' own paste prompts use, and the path the preview site and `docs/constants/navigation.js` use in [expo/expo#52087](https://github.com/expo/expo/pull/52087).
-2. `https://docs.expo.dev/eas/agentic-workflows/<slug>.md` — possible final home under the EAS section. The PR description still mentions `pages/eas/agentic-workflows/`.
-3. `https://pr-52087.expo-docs.pages.dev/agentic-workflows/<slug>.md` — preview, until that PR merges. The preview host can disappear. If stderr shows this host, tell the user the steps came from the unreleased preview.
+1. `https://docs.expo.dev/agentic-workflows/<slug>.md`. The guides' paste prompts use this path. The preview site and `docs/constants/navigation.js` in [expo/expo#52087](https://github.com/expo/expo/pull/52087) use it too.
+2. `https://docs.expo.dev/eas/agentic-workflows/<slug>.md`. This is a possible final home under the EAS section. The PR description still mentions `pages/eas/agentic-workflows/`.
+3. `https://pr-52087.expo-docs.pages.dev/agentic-workflows/<slug>.md`. This is the preview until that PR merges. The preview host can disappear. If stderr shows this host, tell the user the steps came from the unreleased preview.
 
 If the script is unavailable, fetch the same URLs in the same order with whatever HTTP tool you have. Accept the first body that is markdown for that guide. Ignore an HTML shell.
 
@@ -26,7 +26,7 @@ Each page ends with a "paste this into your agent" prompt. Follow that prompt. T
 
 | Slug | Install it when | Depends on |
 | --- | --- | --- |
-| `introduction` | The user wants the model, not a specific workflow | — |
+| `introduction` | The user wants the model, not a specific workflow | None |
 | `agentic-ci` | Test each pull request and comment a verdict | Shared setup |
 | `issue-to-pr` | A GitHub `agent` label should open a PR | Agentic CI, plus `GITHUB_TOKEN` and `GITHUB_REPOSITORY` |
 | `bug-triage` | Reproduce a GitHub issue, or TestFlight feedback on iOS | Agentic CI and Issue to PR |
@@ -38,7 +38,7 @@ There is no Agent Sessions guide in this section. If the user asks for one, say 
 
 ## Copy rules
 
-- Create each file at the path the fetched page shows, with that page's content for the agent and controller the user named. A code fence names that path after the language, such as `sh .eas/agents/run-agent.sh`. Use that path. A fence without a path is a prompt or a profile snippet, and the heading above it says which file it belongs to.
+- Create each file at the path the fetched page shows, with that page's content for the agent and controller the user named. A code fence names that path after the language, such as `sh .eas/agents/run-agent.sh`. Use that path. A fence without a path is a prompt or a profile snippet. The heading above it says which file it belongs to.
 - The page shows one runner per agent (Claude Code, Codex, Cursor, Grok) and one `start-session.sh` per controller (`agent-device`, Argent). Copy one of each. Do not merge them.
 - Claude Code and Grok runners on the page already allow both controllers in `device` mode. Keep both allow rules even when the user picked one controller.
 - Cursor also needs the `.cursor/cli.json` from the page.
@@ -51,7 +51,7 @@ There is no Agent Sessions guide in this section. If the user asks for one, say 
 
 ## Worked example that is not the source of truth
 
-https://github.com/jacobhammerle/todo-app is a reference app with agent workflows already running. Its layout is older than these guides: prompts sit at `.eas/*.md`, secrets are described on the `production` environment, and it uses a personal access token. When the repo and a fetched guide disagree, follow the guide.
+https://github.com/jacobhammerle/todo-app is a reference app with agent workflows already running. Its layout is older than these guides. Prompts are at `.eas/*.md`, secrets are described on the `production` environment, and it uses a personal access token. When the repo and a fetched guide disagree, follow the guide.
 
 ## Related docs the guides link to
 

@@ -96,7 +96,7 @@ Skills come in two groups so the free vs paid boundary stays clear: open-source 
 - **eas-app-stores** - Build and submit iOS/Android apps to the stores and TestFlight: Expo and other React Native projects, plus existing native apps
 - **eas-hosting** - Deploy Expo websites and API routes to EAS Hosting (secrets, custom domains, Cloudflare Workers)
 - **eas-workflows** - EAS workflow YAML files for CI/CD pipelines
-- **eas-agentic-workflows** - Headless coding agent inside EAS Workflows on an Expo Simulators session, posting a verdict and evidence
+- **eas-agentic-workflows** - Headless coding agent inside EAS Workflows on an Expo Simulators session. It posts a verdict and evidence.
 - **eas-observe** - EAS Observe setup and launch, route, event, and version metrics
 - **eas-update** - Configure, publish, test, and debug over-the-air updates
 - **eas-update-insights** - Check EAS Update health, crash rates, adoption, and payload size
