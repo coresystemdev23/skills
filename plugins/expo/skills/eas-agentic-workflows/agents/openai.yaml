@@ -1,0 +1,4 @@
+interface:
+  display_name: "EAS Agentic Workflows"
+  short_description: "Add an EAS workflow that runs a headless coding agent on an Expo Simulators session and returns evidence"
+  default_prompt: "Use $eas-agentic-workflows to add Agentic CI, Issue to PR, Bug triage, or QA Swarm to this Expo project. Ask which workflow, platform, agent, and controller to use, follow the live agentic-workflows docs, and validate with eas workflow:validate. Never print or store tokens."

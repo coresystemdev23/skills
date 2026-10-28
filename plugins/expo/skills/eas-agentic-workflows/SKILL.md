@@ -1,0 +1,119 @@
+---
+name: eas-agentic-workflows
+description: "Set up an Expo agentic workflow that runs a headless coding agent (Claude Code, Codex, Cursor, or Grok via .eas/agents/run-agent.sh) inside EAS Workflows, drives an Expo Simulators session with agent-device or Argent, and returns a verdict, screenshots, a recording, and a preview link without merging. Use when the user wants Agentic CI on pull requests, Issue to PR from a GitHub issue, Bug triage of a GitHub issue or TestFlight feedback, QA Swarm, or mentions EXPO_TOKEN_SIMULATOR or agentic workflows. Not for ordinary EAS Workflow YAML (eas-workflows) or driving a cloud simulator from this machine (eas-simulator)."
+version: 1.0.0
+license: MIT
+allowed-tools: "Read,Write,Bash(node:*),Bash(npx *eas-cli@*),Bash(npx expo *),Bash(eas *)"
+---
+
+# EAS Agentic Workflows
+
+> **EAS service - costs apply.** A run spends EAS Workflow minutes, EAS Build minutes when the fingerprint misses, an Expo Simulators session (up to 30 minutes each), and the coding agent's model usage. QA Swarm spends one session and one agent run per lane, and its evidence site uses EAS Hosting. Expo Simulators is a limited-access preview: it is not included with paid or free plans and is available only to select partners. Check access before installing a workflow. Join the waitlist at https://expo.dev/services/simulators when access is off. See https://expo.dev/pricing.
+
+An agentic workflow runs a coding agent in the cloud, on an Expo Simulators session, and posts evidence. A person reviews that evidence. These workflows do not merge, submit, or ship.
+
+Use another skill when the job is different:
+
+- **`eas-workflows`** — write or debug ordinary EAS Workflow YAML (builds, submits, deploys, triggers, syntax). Load it when `workflow:validate` reports a schema error in a file this skill just copied.
+- **`eas-simulator`** — drive a cloud simulator from this machine (install, tap, screenshot, live preview). If that skill is installed as `expo-simulators`, use that name for the same job. Do not start a local `simulator:start` session in place of adding the workflow.
+
+## Decide first
+
+Ask for anything the user has not already named. One message, then wait:
+
+1. **Workflow.** Agentic CI (test a PR), Issue to PR (needs Agentic CI), Bug triage (needs both; TestFlight is iOS only), or QA Swarm. QA Swarm's guide exists, and the launch plan still calls it coming soon — install it only after the user confirms. There is no Agent Sessions guide; ask what they mean instead of inventing one.
+2. **Platform.** iOS, Android, or both. Android emulator support is still in development.
+3. **Agent.** Claude Code, Codex, Cursor, or Grok. Another agent is allowed only if it has a headless mode and a key that works without a browser login.
+4. **Controller.** `agent-device` or Argent.
+
+Bug triage includes the two workflows it depends on. Say that before adding them.
+
+## Read the guide, then copy it
+
+Fetch the page before writing files. File bodies come from that page, not from memory.
+
+```bash
+node <skill-dir>/scripts/fetch-docs.js <introduction|agentic-ci|issue-to-pr|bug-triage|qa-swarm>
+```
+
+The script prints `source: <url>` on stderr. Tell the user when the source is the preview host (`pr-52087.expo-docs.pages.dev`) rather than `docs.expo.dev`. URL order, copy rules, and the runner contract are in [references/docs-pages.md](./references/docs-pages.md). Paths to create are in [references/files.md](./references/files.md).
+
+Follow the page's "paste this into your agent" steps. The rules in this skill win where they disagree: secrets, the four choices above, and not pushing or starting a run unless the user asked.
+
+## Preflight
+
+Run these in the Expo project. Fix or stop before writing workflow files.
+
+1. **CNG.** The guides require Continuous Native Generation: no committed `ios/` or `android/` directory. If those directories are part of the app, stop and say so. Do not delete them.
+2. **App id.** The platform under test needs `ios.bundleIdentifier` or `android.package`. Read `npx expo config --json`. If the id is missing, ask the user. Do not invent one.
+3. **Link.** `npx --yes eas-cli@latest whoami`. If `extra.eas.projectId` is missing, run `npx --yes eas-cli@latest init`. A headless shell uses `EXPO_TOKEN` for this CLI. That is the developer's CLI token, not the robot token below.
+4. **Access.** `npx --yes eas-cli@latest simulator:availability --json`. Continue only when `available` is `true`. Otherwise stop and send the user to the waitlist. You may still add files when they explicitly want the repo prepared, and you must say the workflow cannot run yet.
+5. **`preview` profile.** Add the profile from the fetched page for the chosen platforms. One profile holds both platform keys when they test both. Android also needs a keystore: the user runs `eas credentials --platform android`, selects `preview`, and lets EAS generate it. Do not run that interactive command unattended.
+6. **GitHub.** Agentic CI, Issue to PR, and Bug triage post to GitHub. The user connects the repository to the EAS project. Follow the link on the fetched page (EAS Workflows get started). Do not claim the connection exists because `git remote` is GitHub.
+
+## Secrets
+
+Never print, echo, log, commit, or write a token into a file, a prompt, or the chat. Never create a token. Stop and tell the user what to create, the variable name, and where it goes. They type the value into the Expo dashboard or into `gh secret set`, which prompts. Do not pass a token on the command line.
+
+`eas env:list --environment preview` is how you check. Confirm the **names**. If the CLI prints values, do not repeat them.
+
+Put these in the EAS **`preview`** environment:
+
+| Name | Visibility | Who creates it |
+| --- | --- | --- |
+| `EXPO_TOKEN_SIMULATOR` | Secret | Robot user, **Developer** role, in the account that owns the project. Developer is the lowest role that can start and stop sessions. Not a personal access token. |
+| One agent key: `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY`, `CODEX_API_KEY`, `CURSOR_API_KEY`, or `XAI_API_KEY` | Secret | The user, from the agent section of the fetched page. Claude Code: `claude setup-token` (Pro, Max, Team, or Enterprise) or an Anthropic API key. Codex: an OpenAI API key. Cursor: dashboard API keys. Grok: an xAI key from console.x.ai. |
+
+The agent job can read every variable in `preview`. Keep other secrets out of `preview`. `EXPO_PUBLIC_` values can stay. If `preview` already has a secret such as `NPM_TOKEN`, warn the user that the agent can read it.
+
+Issue to PR and Bug triage also need, in `preview`:
+
+| Name | Visibility | Notes |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | Secret | Fine-grained personal access token. This repository only. Contents, Issues, and Pull requests: read and write. |
+| `GITHUB_REPOSITORY` | Plain text | `owner/name`, such as `acme/app`. |
+
+The job unsets `GITHUB_TOKEN` for the agent process. Codex can still run arbitrary commands on the worker, and a pull request can change `.eas/agents/run-agent.sh`, so the GitHub token stays scoped to this one repository. EAS does not start `pull_request` workflows for forks. Do not widen that.
+
+The Issue to PR GitHub Action needs a **second** robot token stored as the GitHub Actions secret `EXPO_TOKEN` (`gh secret set EXPO_TOKEN`). It is not `EXPO_TOKEN_SIMULATOR`, and it does not go in a file.
+
+Do not commit `.env.eas-simulator`. The session script writes it on the worker. It holds a session token.
+
+## Install
+
+After preflight, create the files listed in [references/files.md](./references/files.md) for the chosen workflow and its dependencies. Copy each body from the fetched page.
+
+Then validate every workflow file you added or edited, from the project root:
+
+```sh
+npx --yes eas-cli@latest workflow:validate .eas/workflows/<file>.yml --non-interactive
+```
+
+Repeat until it prints `Workflow configuration YAML is valid.` This needs a logged-in CLI and a linked project. Do not replace it with a local YAML or JSON Schema check.
+
+Commit the files locally and do not push, unless the user said not to commit or asked you to push. Before committing, read the diff and confirm it contains no token, no `.env.eas-simulator`, and no secret. Tell the user which files you added and which commands only they can run (keystore, `gh secret set`, `gh label create`, GitHub connection, App Store Connect).
+
+Do not start `eas workflow:run` unless the user asks. A run spends build, simulator, and model usage. The first run is slower because it creates a build.
+
+## Read a result
+
+Details and the failure table are in [references/failures.md](./references/failures.md).
+
+- **Agentic CI.** The PR comment shows `PASS` or `FAIL`, the session recording, the artifact report, and a browser-preview link. Each click of that link starts a new session. The run fails when the verdict does not start with `PASS`. Push a new commit to test again. Draft PRs are skipped until they are ready for review.
+- **Issue to PR.** The issue gets a comment with the PR URL. The branch is `agent/issue-<number>`. Agentic CI then comments on that PR. No code change, or an edit under `.eas` or `.github`, does not open a PR.
+- **Bug triage.** The issue comment is `REPLICATED`, `NOT-REPLICATED`, or `INCONCLUSIVE`. A person reads a `REPLICATED` report before adding the `agent` label. Do not add that label yourself. TestFlight intake is iOS only and opens a new issue per report.
+- **QA Swarm.** The workflow run page lists each lane's `PASS` or `FAIL` and an evidence link. A lane fails the run when its verdict is not `PASS`. The evidence site is public.
+
+## References
+
+- [references/docs-pages.md](./references/docs-pages.md) — which URL to fetch, how to copy runners and YAML, what each guide depends on.
+- [references/files.md](./references/files.md) — paths to create for each workflow.
+- [references/failures.md](./references/failures.md) — verdict lines and common setup failures.
+
+## Submitting Feedback
+If you encounter errors, misleading or outdated information in this skill, report it so Expo can improve:
+```bash
+npx --yes @expo/agent-cli@latest feedback --category skills --subject "eas-agentic-workflows" "<actionable feedback>"
+```
+Only submit when you have something specific and actionable to report. Include as much relevant context as possible.
+If an agent repeatedly fails at an Expo task or the user has to step in, submit a brief report of the task, expected result, and what went wrong using `--category evals` and the relevant Expo package or command as `--subject`.
