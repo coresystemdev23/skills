@@ -1,7 +1,6 @@
 ---
 name: eas-agentic-workflows
 description: "Set up an Expo agentic workflow that runs a headless coding agent (Claude Code, Codex, Cursor, or Grok via .eas/agents/run-agent.sh) inside EAS Workflows, drives an Expo Simulators session with agent-device or Argent, and returns a verdict, screenshots, a recording, and a preview link. The workflow does not merge. Use this whenever the user wants Agentic CI on pull requests, Issue to PR from a GitHub issue, Bug triage of a GitHub issue or TestFlight feedback, QA Swarm, or an agent that tests a pull request, opens a pull request from an issue, or reproduces a bug on a cloud simulator in CI. Also use it when they mention EXPO_TOKEN_SIMULATOR, .eas/agents/run-agent.sh, or agentic workflows. Not for ordinary EAS Workflow YAML (eas-workflows) or driving a cloud simulator from this machine (eas-simulator)."
-version: 1.0.0
 license: MIT
 allowed-tools: "Read,Write,Bash(node:*),Bash(npx *eas-cli@*),Bash(npx expo *),Bash(eas *)"
 ---
