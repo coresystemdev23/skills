@@ -36,7 +36,7 @@ Fetch the page before writing files. Copy each file body from that page.
 node <skill-dir>/scripts/fetch-docs.js <introduction|agentic-ci|issue-to-pr|bug-triage|qa-swarm>
 ```
 
-The script prints `source: <url>` on stderr. Tell the user when the source is the preview host (`pr-52087.expo-docs.pages.dev`) rather than `docs.expo.dev`. Read [references/docs-pages.md](./references/docs-pages.md) for the URL order, the copy rules, and the runner contract. Read [references/files.md](./references/files.md) for the paths to create.
+The script fetches `https://docs.expo.dev/agentic-workflows/<slug>.md` and prints `source: <url>` on stderr. Read [references/docs-pages.md](./references/docs-pages.md) for the copy rules and the runner contract. Read [references/files.md](./references/files.md) for the paths to create.
 
 Follow the page's "paste this into your agent" steps. The rules in this skill win where they disagree. That covers secrets, the four choices above, and not pushing or starting a run unless the user asked.
 
@@ -108,7 +108,7 @@ Read [references/failures.md](./references/failures.md) when a run finishes or a
 
 Read a reference when you reach that step. These references do not point at other references.
 
-- [references/docs-pages.md](./references/docs-pages.md). Read it before you fetch a guide or copy a file. It has the URL order, the copy rules, and the runner contract.
+- [references/docs-pages.md](./references/docs-pages.md). Read it before you fetch a guide or copy a file. It has the page URL, the copy rules, and the runner contract.
 - [references/files.md](./references/files.md). Read it when you create files for the chosen workflow.
 - [references/failures.md](./references/failures.md). Read it when you interpret a verdict or a command fails.
 

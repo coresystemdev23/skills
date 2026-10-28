@@ -1,17 +1,11 @@
 #!/usr/bin/env node
-// Fetch one agentic-workflows guide as markdown.
-// Tries the published docs paths, then the expo/expo#52087 preview.
+// Fetch one agentic-workflows guide as markdown from docs.expo.dev.
 // Prints the page on stdout and `source: <url>` on stderr.
 
 const SLUGS = ['introduction', 'agentic-ci', 'issue-to-pr', 'bug-triage', 'qa-swarm'];
 
-// Published path is not final. expo/expo#52087 currently serves /agentic-workflows/.
-// The PR description also mentions pages/eas/agentic-workflows/.
-const BASES = [
-  'https://docs.expo.dev/agentic-workflows',
-  'https://docs.expo.dev/eas/agentic-workflows',
-  'https://pr-52087.expo-docs.pages.dev/agentic-workflows',
-];
+// docs/pages/agentic-workflows/ and the guides' paste prompts use this path.
+const DOCS_BASE = 'https://docs.expo.dev/agentic-workflows';
 
 function looksLikeGuide(text) {
   if (!text || text.length < 400) return false;
@@ -27,31 +21,25 @@ async function main() {
     process.exit(2);
   }
 
-  const errors = [];
-  for (const base of BASES) {
-    const url = `${base}/${slug}.md`;
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        errors.push(`${url} -> HTTP ${response.status}`);
-        continue;
-      }
-      const text = await response.text();
-      if (!looksLikeGuide(text)) {
-        errors.push(`${url} -> response was not the guide`);
-        continue;
-      }
-      console.error(`source: ${url}`);
-      process.stdout.write(text.endsWith('\n') ? text : `${text}\n`);
-      return;
-    } catch (error) {
-      errors.push(`${url} -> ${error instanceof Error ? error.message : String(error)}`);
+  const url = `${DOCS_BASE}/${slug}.md`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(`Could not fetch ${url} (HTTP ${response.status}).`);
+      process.exit(1);
     }
+    const text = await response.text();
+    if (!looksLikeGuide(text)) {
+      console.error(`Could not fetch ${url}. The response was not the guide.`);
+      process.exit(1);
+    }
+    console.error(`source: ${url}`);
+    process.stdout.write(text.endsWith('\n') ? text : `${text}\n`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`Could not fetch ${url}. ${message}`);
+    process.exit(1);
   }
-
-  console.error(`Could not fetch the ${slug} guide.`);
-  for (const line of errors) console.error(`  ${line}`);
-  process.exit(1);
 }
 
 main();

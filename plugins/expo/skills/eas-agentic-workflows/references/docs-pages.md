@@ -12,13 +12,9 @@ node <skill-dir>/scripts/fetch-docs.js <slug>
 
 Slugs: `introduction`, `agentic-ci`, `issue-to-pr`, `bug-triage`, `qa-swarm`.
 
-The script prints the markdown on stdout and `source: <url>` on stderr. It tries these bases in order:
+The script prints the markdown on stdout and `source: <url>` on stderr. The page is `https://docs.expo.dev/agentic-workflows/<slug>.md`. The guides live in `docs/pages/agentic-workflows/`, and the paste prompts use this path.
 
-1. `https://docs.expo.dev/agentic-workflows/<slug>.md`. The guides' paste prompts use this path. The preview site and `docs/constants/navigation.js` in [expo/expo#52087](https://github.com/expo/expo/pull/52087) use it too.
-2. `https://docs.expo.dev/eas/agentic-workflows/<slug>.md`. This is a possible final home under the EAS section. The PR description still mentions `pages/eas/agentic-workflows/`.
-3. `https://pr-52087.expo-docs.pages.dev/agentic-workflows/<slug>.md`. This is the preview until that PR merges. The preview host can disappear. If stderr shows this host, tell the user the steps came from the unreleased preview.
-
-If the script is unavailable, fetch the same URLs in the same order with whatever HTTP tool you have. Accept the first body that is markdown for that guide. Ignore an HTML shell.
+If the script is unavailable, fetch that URL. Accept the body when it is the guide. Ignore an HTML shell.
 
 Each page ends with a "paste this into your agent" prompt. Follow that prompt. This skill's rules win on secrets, on asking for workflow / platform / agent / controller, and on not pushing or running unless the user asked.
 
@@ -30,7 +26,7 @@ Each page ends with a "paste this into your agent" prompt. Follow that prompt. T
 | `agentic-ci` | Test each pull request and comment a verdict | Shared setup |
 | `issue-to-pr` | A GitHub `agent` label should open a PR | Agentic CI, plus `GITHUB_TOKEN` and `GITHUB_REPOSITORY` |
 | `bug-triage` | Reproduce a GitHub issue, or TestFlight feedback on iOS | Agentic CI and Issue to PR |
-| `qa-swarm` | Several agents test flows in parallel | Shared setup. Confirm first: the launch plan calls QA Swarm "coming soon" even though the preview page exists. |
+| `qa-swarm` | Several agents test flows in parallel | Shared setup. Confirm first. The launch plan calls QA Swarm coming soon. |
 
 Shared setup (app id, `preview` profile, robot token, agent key, `run-agent.sh`) is repeated on every guide. Do those steps once.
 
@@ -58,6 +54,6 @@ https://github.com/jacobhammerle/todo-app is a reference app with agent workflow
 Follow the link on the fetched page rather than guessing the URL. The usual targets:
 
 - EAS Workflows get started, including connecting GitHub: `https://docs.expo.dev/eas/workflows/get-started/`
-- Expo Simulators: `https://docs.expo.dev/preview/simulators/introduction/` while the preview path is current
+- Expo Simulators: `https://docs.expo.dev/preview/simulators/introduction/`
 - Waitlist: `https://expo.dev/services/simulators`
 - Pricing: `https://expo.dev/pricing`
